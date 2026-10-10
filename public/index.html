@@ -3,28 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sports Facility Booking System - Complete assessment implementation of FR1-FR10, BR1-BR10, and T1-T12 tests with Node.js and MySQL.">
-  <title>Sports Facility Booking System | Enterprise Reservation Engine</title>
+  <meta name="description" content="Apex Arena - Sports Facility Booking System. Seamless real-time court and arena reservations powered by Node.js, Express, and MySQL.">
+  <title>Apex Arena | Premium Sports Facility Booking</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
 
-  <!-- Top Sticky Header -->
+  <!-- Sticky Top Header -->
   <header class="top-header">
     <div class="header-inner">
       <div class="logo-brand">
         <div class="logo-icon">⚡</div>
         <div class="brand-title">
-          <span>APEX ARENA</span>
-          <span class="brand-badge">Sports Facility Booking System</span>
+          <span class="brand-name">APEX ARENA</span>
+          <span class="brand-badge">Sports Facility Booking</span>
         </div>
       </div>
 
       <!-- Role Selector & Session Simulator -->
       <div class="role-switcher-card">
-        <span class="role-switcher-label">Active Actor:</span>
+        <span class="role-switcher-label">Actor Role:</span>
         <select id="userSelector" class="role-select" aria-label="Select Actor Role">
           <option value="user1" selected>User 1: John Doe (Phone: 9876543210)</option>
           <option value="user2">User 2: Jane Smith (Phone: 9123456780)</option>
@@ -35,27 +35,52 @@
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- Main Application Container -->
   <main class="app-container">
 
     <!-- Notification Banner -->
     <div id="notificationBanner" class="notification-banner" style="display: none;"></div>
 
-    <!-- Navigation Tabs -->
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-tag">⚡ Live Court Reservation Engine</div>
+      <h1 class="hero-title">Book Premium Sports Facilities <span class="hero-highlight">in Real Time</span></h1>
+      <p class="hero-subtitle">
+        Reserve badminton courts, tennis turfs, squash arenas, swimming pools, and cricket turfs with atomic availability, transparent pricing, and instant slot confirmation.
+      </p>
+
+      <div class="hero-stats-row">
+        <div class="hero-stat">
+          <span class="hero-stat-value">5</span>
+          <span class="hero-stat-label">Active Venues</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">38</span>
+          <span class="hero-stat-label">Total Slots</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">06:00 - 22:00</span>
+          <span class="hero-stat-label">Operating Hours</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value" style="color: var(--accent-cyan);">100% ACID</span>
+          <span class="hero-stat-label">Atomic Guarantee</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs (Only Core User & Admin Functional Views) -->
     <nav class="nav-tabs" role="tablist">
       <button class="tab-btn active" data-tab="tab-facilities" role="tab" aria-selected="true">
-        <span>🏟️</span> Facilities & Availability (FR1)
+        <span>🏟️</span> Explore Facilities
       </button>
       <button class="tab-btn" data-tab="tab-my-bookings" role="tab" aria-selected="false">
-        <span>📋</span> My Bookings (FR6, FR8)
+        <span>📋</span> My Reservations
         <span id="myBookingsBadge" class="tab-count">0</span>
       </button>
       <button class="tab-btn" data-tab="tab-admin" id="adminTabBtn" role="tab" aria-selected="false" style="display: none;">
-        <span>🛡️</span> Administrator Operations (FR7, FR9)
+        <span>🛡️</span> Administrator Console
         <span id="allBookingsBadge" class="tab-count">0</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-tests" role="tab" aria-selected="false">
-        <span>🧪</span> Assessment Test Suite (T1–T12)
       </button>
     </nav>
 
@@ -63,8 +88,8 @@
     <section id="tab-facilities" class="view-section active">
       <div class="section-banner">
         <div>
-          <h1 class="section-title">Sports Facilities Catalog</h1>
-          <p class="section-subtitle">Real-time availability, operating schedules, and rate snapshots for synthetic facilities (R101–R105)</p>
+          <h2 class="section-title">Available Arenas & Courts</h2>
+          <p class="section-subtitle">Real-time slot availability, operating schedules, and rate snapshots</p>
         </div>
         <button id="refreshFacilitiesBtn" class="btn btn-secondary">🔄 Refresh Availability</button>
       </div>
@@ -76,19 +101,19 @@
           <input type="text" id="facilitySearchInput" class="search-input" placeholder="Search facilities by name, code (e.g. R101), or sport..." aria-label="Search facilities">
         </div>
         <div class="filter-chips" id="categoryChips">
-          <button class="chip-btn active" data-category="ALL">All Categories</button>
-          <button class="chip-btn" data-category="Badminton">Badminton</button>
-          <button class="chip-btn" data-category="Tennis">Tennis</button>
-          <button class="chip-btn" data-category="Squash">Squash / TT</button>
-          <button class="chip-btn" data-category="Swimming">Swimming</button>
-          <button class="chip-btn" data-category="Cricket">Cricket</button>
+          <button class="chip-btn active" data-category="ALL">All Sports</button>
+          <button class="chip-btn" data-category="Badminton">🏸 Badminton</button>
+          <button class="chip-btn" data-category="Tennis">🎾 Tennis</button>
+          <button class="chip-btn" data-category="Squash">🏓 Squash / TT</button>
+          <button class="chip-btn" data-category="Swimming">🏊 Swimming</button>
+          <button class="chip-btn" data-category="Cricket">🏏 Cricket</button>
         </div>
       </div>
 
       <!-- Facilities Grid -->
       <div id="facilitiesGrid" class="facilities-grid">
         <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
-          Loading synthetic sports facilities...
+          Loading available sports facilities...
         </div>
       </div>
     </section>
@@ -97,8 +122,8 @@
     <section id="tab-my-bookings" class="view-section">
       <div class="section-banner">
         <div>
-          <h1 class="section-title">My Facility Reservations</h1>
-          <p class="section-subtitle">Scoped strictly to the authenticated user account with cancellation rights for confirmed bookings</p>
+          <h2 class="section-title">My Bookings & History</h2>
+          <p class="section-subtitle">Manage reservations scoped to your active account with cancellation rights for confirmed bookings</p>
         </div>
         <button id="refreshMyBookingsBtn" class="btn btn-secondary">🔄 Refresh Bookings</button>
       </div>
@@ -110,7 +135,7 @@
               <th>Booking Ref</th>
               <th>Sports Facility</th>
               <th>Date</th>
-              <th>Qty / Fare Snapshot</th>
+              <th>Qty / Fare Breakdown</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -130,7 +155,7 @@
     <section id="tab-admin" class="view-section">
       <div class="section-banner">
         <div>
-          <h1 class="section-title">Administrator Control Center</h1>
+          <h2 class="section-title">Administrator Control Center</h2>
           <p class="section-subtitle">Operational status progression, stage-skipping prevention, and system audit history</p>
         </div>
         <div style="display: flex; gap: 10px;">
@@ -150,11 +175,11 @@
           <div id="metricConfirmed" class="metric-value" style="color: var(--success);">0</div>
         </div>
         <div class="metric-card">
-          <div class="metric-label">Checked-In / Boarded</div>
+          <div class="metric-label">Checked-In / In-Play</div>
           <div id="metricCheckedIn" class="metric-value" style="color: var(--info);">0</div>
         </div>
         <div class="metric-card">
-          <div class="metric-label">Completed</div>
+          <div class="metric-label">Completed Sessions</div>
           <div id="metricCompleted" class="metric-value" style="color: var(--purple);">0</div>
         </div>
       </div>
@@ -170,7 +195,7 @@
               <th>Date</th>
               <th>Qty / Fare</th>
               <th>Current Stage</th>
-              <th>Operational Progression (BR8)</th>
+              <th>Operational Progression</th>
               <th>Audit</th>
             </tr>
           </thead>
@@ -182,37 +207,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </section>
-
-    <!-- TAB 4: Assessment Test Suite (T1–T12) -->
-    <section id="tab-tests" class="view-section">
-      <div class="section-banner">
-        <div>
-          <h1 class="section-title">Mandatory Assessment Test Suite (T1–T12)</h1>
-          <p class="section-subtitle">Execute and verify all 12 specification test requirements with genuine live database assertion logs</p>
-        </div>
-        <button id="runAllTestsBtn" class="btn btn-primary">🚀 Execute All 12 Mandatory Tests</button>
-      </div>
-
-      <div class="test-panel-card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="font-family: var(--font-heading); font-size: 16px;">Test Suite Overview & Matrix</h3>
-          <span id="testSummaryCounter" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary);">
-            0 / 12 Executed
-          </span>
-        </div>
-
-        <div class="test-grid" id="testGrid">
-          <!-- Dynamically populated or static cards for T1-T12 -->
-        </div>
-
-        <div style="margin-top: 20px;">
-          <h4 style="font-family: var(--font-heading); font-size: 14px; margin-bottom: 8px; color: var(--text-secondary);">
-            Live Test Execution Console & Log Evidence:
-          </h4>
-          <pre id="testConsoleOutput" class="console-output">Click "Execute All 12 Mandatory Tests" to run tests against the live MySQL database...</pre>
-        </div>
       </div>
     </section>
 
@@ -232,31 +226,31 @@
         <input type="hidden" id="bookingFacilityCode">
 
         <!-- Facility Info Header -->
-        <div style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px;">
+        <div style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.22); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 22px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <div id="modalFacilityCode" style="font-family: var(--font-mono); font-size: 12px; color: var(--accent-cyan); font-weight: 700;">R101</div>
-              <div id="modalFacilityName" style="font-family: var(--font-heading); font-size: 18px; font-weight: 700;">Sports Facility A</div>
+              <div id="modalFacilityCode" style="font-family: var(--font-mono); font-size: 13px; color: var(--accent-cyan); font-weight: 800;">R101</div>
+              <div id="modalFacilityName" style="font-family: var(--font-heading); font-size: 20px; font-weight: 800; color: #ffffff;">Sports Facility A</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 11px; color: var(--text-muted);">ACTIVE RATE</div>
-              <div id="modalFacilityRate" style="font-family: var(--font-heading); font-size: 20px; font-weight: 800; color: #ffffff;">Rs. 499</div>
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Rate / Slot</div>
+              <div id="modalFacilityRate" style="font-family: var(--font-heading); font-size: 22px; font-weight: 900; color: #ffffff;">Rs. 499</div>
             </div>
           </div>
-          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;" id="modalAvailabilityInfo">
+          <div style="font-size: 13px; color: var(--text-secondary); margin-top: 10px; display: flex; align-items: center; gap: 6px;" id="modalAvailabilityInfo">
             Available: 10 slots
           </div>
         </div>
 
         <!-- Quantity Selection (BR1 / FR2) -->
         <div class="form-group">
-          <label class="form-label" for="bookingQuantityInput">Quantity of Slots (BR1: 1 to 5 Only)</label>
+          <label class="form-label" for="bookingQuantityInput">Number of Slots (1 to 5 Only)</label>
           <div class="quantity-stepper">
             <button type="button" class="stepper-btn" id="qtyDecrementBtn" aria-label="Decrease quantity">−</button>
             <input type="number" id="bookingQuantityInput" class="stepper-input" value="1" min="1" max="5" step="1" required aria-label="Quantity of slots">
             <button type="button" class="stepper-btn" id="qtyIncrementBtn" aria-label="Increase quantity">+</button>
           </div>
-          <div class="form-hint">Enforces BR1: Integer values 1–5 only. Decimals, 0, negatives, and >5 rejected.</div>
+          <div class="form-hint">Rule BR1: Integer quantity 1–5 only. Decimals, negatives, 0, and &gt;5 rejected.</div>
         </div>
 
         <!-- Fare Calculation Breakdown (BR4 / FR3) -->
@@ -274,7 +268,7 @@
             <span id="fareBaseAmount">Rs. 499.00</span>
           </div>
           <div class="fare-row">
-            <span>Booking Charge (BR4 Threshold)</span>
+            <span>Booking Charge</span>
             <span id="fareBookingCharge">Rs. 50.00</span>
           </div>
           <div class="fare-row total">
@@ -288,7 +282,7 @@
 
         <!-- Customer Identity Details (BR5 / FR4) -->
         <div class="form-group">
-          <label class="form-label" for="customerNameInput">Customer Full Name (Required, Non-Blank)</label>
+          <label class="form-label" for="customerNameInput">Customer Full Name (Required)</label>
           <input type="text" id="customerNameInput" class="form-control" required placeholder="e.g. John Doe">
         </div>
 
@@ -299,19 +293,19 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="bookingDateInput">Booking Date (Today or Future Date)</label>
+          <label class="form-label" for="bookingDateInput">Booking Date (Today or Future)</label>
           <input type="date" id="bookingDateInput" class="form-control" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="identityProofInput">Identity / Reference ID (BR5 Non-Blank)</label>
+          <label class="form-label" for="identityProofInput">Identity / Member Reference ID</label>
           <input type="text" id="identityProofInput" class="form-control" required placeholder="e.g. GOV-DL-98214 or MEMBER-01">
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <div style="display: flex; gap: 14px; margin-top: 26px;">
           <button type="button" class="btn btn-secondary" id="cancelModalBtn" style="flex: 1;">Cancel</button>
           <button type="submit" class="btn btn-primary" id="confirmReservationBtn" style="flex: 2;">
-            ⚡ Confirm Reservation (BR7 Atomic)
+            ⚡ Confirm Reservation
           </button>
         </div>
       </form>
@@ -327,26 +321,26 @@
       <button class="modal-close" id="closeReceiptModalBtn" aria-label="Close dialog">✕</button>
     </div>
     <div class="modal-body">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Booking Reference</div>
-        <div id="receiptReference" style="font-family: var(--font-mono); font-size: 24px; font-weight: 800; color: var(--accent-cyan); margin-top: 4px;">
+      <div style="text-align: center; margin-bottom: 22px;">
+        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Booking Reference</div>
+        <div id="receiptReference" style="font-family: var(--font-mono); font-size: 26px; font-weight: 900; color: var(--accent-cyan); margin-top: 4px;">
           BK-20261010-XXXX
         </div>
         <div class="status-pill confirmed" style="margin-top: 8px;">CONFIRMED</div>
       </div>
 
-      <div style="background: rgba(10, 14, 23, 0.7); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px;">
+      <div style="background: rgba(10, 14, 23, 0.75); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px; margin-bottom: 22px;">
         <div class="fare-row">
           <span>Facility</span>
-          <span id="receiptFacilityName" style="color: #ffffff; font-weight: 600;">Sports Facility A</span>
+          <span id="receiptFacilityName" style="color: #ffffff; font-weight: 700;">Sports Facility A</span>
         </div>
         <div class="fare-row">
           <span>Booking Date</span>
           <span id="receiptBookingDate" style="color: #ffffff;">2026-10-11</span>
         </div>
         <div class="fare-row">
-          <span>Booked Slots (Quantity)</span>
-          <span id="receiptQuantity" style="color: #ffffff;">2</span>
+          <span>Booked Slots</span>
+          <span id="receiptQuantity" style="color: #ffffff; font-weight: 600;">2 slot(s)</span>
         </div>
         <div class="fare-row">
           <span>Customer Name</span>
@@ -367,7 +361,7 @@
       </div>
 
       <button type="button" class="btn btn-primary" id="viewInMyBookingsBtn" style="width: 100%;">
-        View in My Bookings
+        View in My Bookings ➔
       </button>
     </div>
   </dialog>
@@ -376,12 +370,12 @@
   <dialog id="historyModal" class="custom-modal" aria-labelledby="historyModalTitle">
     <div class="modal-header">
       <h2 id="historyModalTitle" class="modal-title">
-        <span>📜</span> Booking Audit Trail & Status History
+        <span>📜</span> Booking Audit Trail & Lifecycle
       </h2>
       <button class="modal-close" id="closeHistoryModalBtn" aria-label="Close dialog">✕</button>
     </div>
     <div class="modal-body">
-      <div id="historyModalHeader" style="margin-bottom: 16px; font-size: 13px; color: var(--text-secondary);"></div>
+      <div id="historyModalHeader" style="margin-bottom: 18px; font-size: 14px; color: var(--text-secondary);"></div>
       <div class="timeline" id="historyTimeline">
         <!-- Rendered events -->
       </div>
