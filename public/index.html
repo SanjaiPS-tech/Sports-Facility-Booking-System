@@ -24,13 +24,20 @@
 
       <!-- Role Selector & Session Simulator -->
       <div class="role-switcher-card">
-        <span class="role-switcher-label">Actor Role:</span>
+        <div class="user-avatar-badge" id="headerUserAvatar">JD</div>
+        <div class="user-session-info">
+          <span class="user-session-name" id="headerUserName">John Doe</span>
+          <span class="user-session-sub" id="headerUserPhone">9876543210</span>
+        </div>
         <select id="userSelector" class="role-select" aria-label="Select Actor Role">
           <option value="user1" selected>User 1: John Doe (Phone: 9876543210)</option>
           <option value="user2">User 2: Jane Smith (Phone: 9123456780)</option>
           <option value="admin">Administrator: Facility Administrator</option>
         </select>
         <div id="activeRoleBadge" class="role-pill user">USER ROLE</div>
+        <button id="openLoginModalBtn" class="btn btn-secondary user-session-btn" title="Open Logins & Accounts Portal">
+          🔑 Switch User
+        </button>
       </div>
     </div>
   </header>
@@ -81,6 +88,9 @@
       <button class="tab-btn" data-tab="tab-admin" id="adminTabBtn" role="tab" aria-selected="false" style="display: none;">
         <span>🛡️</span> Administrator Console
         <span id="allBookingsBadge" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-login" id="loginTabBtn" role="tab" aria-selected="false">
+        <span>🔐</span> Login & Accounts
       </button>
     </nav>
 
@@ -210,6 +220,209 @@
       </div>
     </section>
 
+    <!-- TAB 4: Authentication & Logins Portal (FR9, BR10) -->
+    <section id="tab-login" class="view-section">
+      <div class="section-banner">
+        <div>
+          <h2 class="section-title">🔐 Account Logins & Access Control Portal</h2>
+          <p class="section-subtitle">Simulate authenticated user sessions, switch roles (Customer vs. Administrator), or sign in with credentials.</p>
+        </div>
+      </div>
+
+      <!-- Active Session Highlight Card -->
+      <div class="active-session-card" id="activeSessionCard">
+        <div class="active-session-left">
+          <div class="active-session-avatar" id="activeCardAvatar">JD</div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <h3 class="active-session-name" id="activeCardFullName">John Doe</h3>
+              <span class="role-pill user" id="activeCardRolePill">USER ROLE</span>
+            </div>
+            <div class="active-session-meta">
+              <span>Username: <strong id="activeCardUsername">user1</strong></span> • 
+              <span>Phone: <strong id="activeCardPhone">9876543210</strong></span> • 
+              <span>Email: <strong id="activeCardEmail">john.doe@example.com</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="active-session-badge-wrap">
+          <span class="active-status-dot"></span> Active Authenticated Session
+        </div>
+      </div>
+
+      <!-- Two-Column Layout: Direct Sign-In Form & Quick Role Logins -->
+      <div class="login-portal-grid">
+        
+        <!-- Left Column: Direct Credentials Sign In -->
+        <div class="login-column-card">
+          <h3 class="login-card-title"><span>🔑</span> Direct Account Sign In</h3>
+          <p class="login-card-subtitle">Enter your username or registered 10-digit mobile number to authenticate.</p>
+          
+          <form id="directLoginForm" class="direct-login-form">
+            <div class="form-group">
+              <label class="form-label" for="loginIdentifierInput">Username or 10-Digit Mobile Phone</label>
+              <input type="text" id="loginIdentifierInput" class="form-control" placeholder="e.g. user1, user2, admin, or 9876543210" required>
+              <div class="form-hint">Accepted usernames: <code>user1</code>, <code>user2</code>, <code>admin</code> or their phone numbers.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="loginPasswordInput">Security PIN / Password (Demo Mode)</label>
+              <input type="password" id="loginPasswordInput" class="form-control" value="••••••••" placeholder="Enter password (optional in demo)">
+              <div class="form-hint">Synthetic demo mode: Any password accepted for registered users.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px;">
+              🚀 Sign In to Apex Arena
+            </button>
+          </form>
+        </div>
+
+        <!-- Right Column: One-Click Instant Role Logins -->
+        <div class="login-column-card">
+          <h3 class="login-card-title"><span>⚡</span> Quick One-Click Role Logins</h3>
+          <p class="login-card-subtitle">Instant single-click account switching between all predefined system actors (FR9, BR10).</p>
+          
+          <div class="quick-accounts-list">
+            
+            <!-- User 1 Card -->
+            <div class="account-select-card" id="card-user1" onclick="loginAs('user1')">
+              <div class="account-select-header">
+                <div class="account-avatar user1-av">JD</div>
+                <div class="account-details">
+                  <div class="account-name-row">
+                    <span class="account-name">John Doe</span>
+                    <span class="role-pill user">USER</span>
+                  </div>
+                  <div class="account-sub">Phone: 9876543210 • Username: user1</div>
+                </div>
+              </div>
+              <div class="account-perms">
+                ✅ Browse Facilities • ✅ Reserve 1–5 Slots • ✅ Cancel Confirmed Bookings
+              </div>
+              <button type="button" class="btn btn-secondary switch-user-btn">
+                Sign In as John Doe
+              </button>
+            </div>
+
+            <!-- User 2 Card -->
+            <div class="account-select-card" id="card-user2" onclick="loginAs('user2')">
+              <div class="account-select-header">
+                <div class="account-avatar user2-av">JS</div>
+                <div class="account-details">
+                  <div class="account-name-row">
+                    <span class="account-name">Jane Smith</span>
+                    <span class="role-pill user">USER</span>
+                  </div>
+                  <div class="account-sub">Phone: 9123456780 • Username: user2</div>
+                </div>
+              </div>
+              <div class="account-perms">
+                ✅ Browse Facilities • ✅ Independent Scope • ⛔ Protected from user1 (BR10)
+              </div>
+              <button type="button" class="btn btn-secondary switch-user-btn">
+                Sign In as Jane Smith
+              </button>
+            </div>
+
+            <!-- Admin Card -->
+            <div class="account-select-card" id="card-admin" onclick="loginAs('admin')">
+              <div class="account-select-header">
+                <div class="account-avatar admin-av">FA</div>
+                <div class="account-details">
+                  <div class="account-name-row">
+                    <span class="account-name">Facility Administrator</span>
+                    <span class="role-pill admin">ADMINISTRATOR</span>
+                  </div>
+                  <div class="account-sub">Phone: 9998887770 • Username: admin</div>
+                </div>
+              </div>
+              <div class="account-perms">
+                🛡️ Operational Progression • 🛡️ Sequential Stages (BR8) • 🛡️ Seed Reset
+              </div>
+              <button type="button" class="btn btn-primary switch-user-btn">
+                Sign In as Administrator
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Role Permission Matrix Table -->
+      <div class="table-card" style="margin-top: 32px;">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-secondary);">
+          <h3 style="font-family: var(--font-heading); font-size: 18px; font-weight: 800; color: var(--text-primary);">
+            📋 Role-Based Access Control (RBAC) Enforcement Matrix (FR9, BR10)
+          </h3>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+            Enforced by <code>src/middlewares/authMiddleware.js</code> and MySQL row-level scoping.
+          </p>
+        </div>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Operation / Feature</th>
+              <th>Customer / User Role</th>
+              <th>Administrator Role</th>
+              <th>Enforcement Rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Explore Facilities & Real-time Slots</strong></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td>FR1: Unrestricted public availability catalog</td>
+            </tr>
+            <tr>
+              <td><strong>Create Reservation (1–5 Slots)</strong></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td>FR2, BR1, BR2: Atomic ACID row locks prevent race conditions</td>
+            </tr>
+            <tr>
+              <td><strong>View Own Reservations</strong></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td>FR6: Scoped strictly to authenticated <code>user_id</code></td>
+            </tr>
+            <tr>
+              <td><strong>View Other Users' Bookings</strong></td>
+              <td><span class="status-pill cancelled">Denied (HTTP 403)</span></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td>BR10: Ownership boundaries strictly guarded</td>
+            </tr>
+            <tr>
+              <td><strong>Cancel Confirmed Reservation</strong></td>
+              <td><span class="status-pill confirmed">Allowed (Own Only)</span></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td>FR8, BR9: One-time stock restoration idempotent safeguard</td>
+            </tr>
+            <tr>
+              <td><strong>Operational Status Progression</strong></td>
+              <td><span class="status-pill cancelled">Denied (HTTP 403)</span></td>
+              <td><span class="status-pill confirmed">Allowed (Sequential)</span></td>
+              <td>FR7, BR8, BR10: <code>CONFIRMED -> CHECKED_IN -> COMPLETED</code></td>
+            </tr>
+            <tr>
+              <td><strong>Skip Stages (e.g. Confirmed to Completed)</strong></td>
+              <td><span class="status-pill cancelled">Denied (HTTP 403)</span></td>
+              <td><span class="status-pill cancelled">Rejected (HTTP 400)</span></td>
+              <td>BR8: Stage-skipping prevention enforced on all actors</td>
+            </tr>
+            <tr>
+              <td><strong>Reset Synthetic Database Seed</strong></td>
+              <td><span class="status-pill cancelled">Denied</span></td>
+              <td><span class="status-pill confirmed">Allowed</span></td>
+              <td>Admin Utility / Assessment Verification Harness</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
   </main>
 
   <!-- MODAL: Reservation Drawer (FR2, FR3, FR4, FR5) -->
@@ -226,18 +439,18 @@
         <input type="hidden" id="bookingFacilityCode">
 
         <!-- Facility Info Header -->
-        <div style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.22); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 22px;">
+        <div class="modal-facility-summary">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <div id="modalFacilityCode" style="font-family: var(--font-mono); font-size: 13px; color: var(--accent-cyan); font-weight: 800;">R101</div>
-              <div id="modalFacilityName" style="font-family: var(--font-heading); font-size: 20px; font-weight: 800; color: #ffffff;">Sports Facility A</div>
+              <div id="modalFacilityCode" class="modal-facility-code">R101</div>
+              <div id="modalFacilityName" class="modal-facility-name">Sports Facility A</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Rate / Slot</div>
-              <div id="modalFacilityRate" style="font-family: var(--font-heading); font-size: 22px; font-weight: 900; color: #ffffff;">Rs. 499</div>
+              <div class="modal-facility-rate-label">Rate / Slot</div>
+              <div id="modalFacilityRate" class="modal-facility-rate">Rs. 499</div>
             </div>
           </div>
-          <div style="font-size: 13px; color: var(--text-secondary); margin-top: 10px; display: flex; align-items: center; gap: 6px;" id="modalAvailabilityInfo">
+          <div class="modal-facility-availability" id="modalAvailabilityInfo">
             Available: 10 slots
           </div>
         </div>
@@ -329,30 +542,30 @@
         <div class="status-pill confirmed" style="margin-top: 8px;">CONFIRMED</div>
       </div>
 
-      <div style="background: rgba(10, 14, 23, 0.75); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px; margin-bottom: 22px;">
+      <div class="receipt-card">
         <div class="fare-row">
           <span>Facility</span>
-          <span id="receiptFacilityName" style="color: #ffffff; font-weight: 700;">Sports Facility A</span>
+          <span id="receiptFacilityName" class="receipt-value">Sports Facility A</span>
         </div>
         <div class="fare-row">
           <span>Booking Date</span>
-          <span id="receiptBookingDate" style="color: #ffffff;">2026-10-11</span>
+          <span id="receiptBookingDate" class="receipt-value">2026-10-11</span>
         </div>
         <div class="fare-row">
           <span>Booked Slots</span>
-          <span id="receiptQuantity" style="color: #ffffff; font-weight: 600;">2 slot(s)</span>
+          <span id="receiptQuantity" class="receipt-value">2 slot(s)</span>
         </div>
         <div class="fare-row">
           <span>Customer Name</span>
-          <span id="receiptCustomerName" style="color: #ffffff;">John Doe</span>
+          <span id="receiptCustomerName" class="receipt-value">John Doe</span>
         </div>
         <div class="fare-row">
           <span>Customer Phone</span>
-          <span id="receiptCustomerPhone" style="color: #ffffff;">9876543210</span>
+          <span id="receiptCustomerPhone" class="receipt-value">9876543210</span>
         </div>
         <div class="fare-row">
           <span>Identity Proof</span>
-          <span id="receiptIdentityProof" style="color: #ffffff;">GOV-ID-12345</span>
+          <span id="receiptIdentityProof" class="receipt-value">GOV-ID-12345</span>
         </div>
         <div class="fare-row total">
           <span>Total Fare Snapshot</span>
@@ -378,6 +591,80 @@
       <div id="historyModalHeader" style="margin-bottom: 18px; font-size: 14px; color: var(--text-secondary);"></div>
       <div class="timeline" id="historyTimeline">
         <!-- Rendered events -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- MODAL: Quick Login & Account Switcher -->
+  <dialog id="loginModal" class="custom-modal" aria-labelledby="loginModalTitle">
+    <div class="modal-header">
+      <h2 id="loginModalTitle" class="modal-title">
+        <span>🔐</span> Sign In & Switch Account
+      </h2>
+      <button class="modal-close" id="closeLoginModalBtn" aria-label="Close dialog">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">
+        Select an actor role to instantly authenticate into Apex Arena (FR9, BR10):
+      </p>
+
+      <div class="quick-accounts-list">
+        <div class="account-select-card" onclick="loginAs('user1'); loginModal.close();">
+          <div class="account-select-header">
+            <div class="account-avatar user1-av">JD</div>
+            <div class="account-details">
+              <div class="account-name-row">
+                <span class="account-name">John Doe</span>
+                <span class="role-pill user">USER</span>
+              </div>
+              <div class="account-sub">Phone: 9876543210 • Regular Customer</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary switch-user-btn" style="width: 100%; margin-top: 10px;">
+            Sign In as John Doe
+          </button>
+        </div>
+
+        <div class="account-select-card" onclick="loginAs('user2'); loginModal.close();">
+          <div class="account-select-header">
+            <div class="account-avatar user2-av">JS</div>
+            <div class="account-details">
+              <div class="account-name-row">
+                <span class="account-name">Jane Smith</span>
+                <span class="role-pill user">USER</span>
+              </div>
+              <div class="account-sub">Phone: 9123456780 • Regular Customer</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary switch-user-btn" style="width: 100%; margin-top: 10px;">
+            Sign In as Jane Smith
+          </button>
+        </div>
+
+        <div class="account-select-card" onclick="loginAs('admin'); loginModal.close();">
+          <div class="account-select-header">
+            <div class="account-avatar admin-av">FA</div>
+            <div class="account-details">
+              <div class="account-name-row">
+                <span class="account-name">Facility Administrator</span>
+                <span class="role-pill admin">ADMINISTRATOR</span>
+              </div>
+              <div class="account-sub">Phone: 9998887770 • Full Management Access</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary switch-user-btn" style="width: 100%; margin-top: 10px;">
+            Sign In as Administrator
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn btn-secondary" id="goToLoginTabBtn" style="font-size: 13px;">
+          View Full Logins Portal ➔
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="loginModal.close()">
+          Close
+        </button>
       </div>
     </div>
   </dialog>

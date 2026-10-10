@@ -9,9 +9,9 @@ const state = {
     currentUser: 'user1',
     currentRole: 'USER',
     users: {
-        user1: { id: 1, username: 'user1', full_name: 'John Doe', phone: '9876543210', role: 'USER' },
-        user2: { id: 2, username: 'user2', full_name: 'Jane Smith', phone: '9123456780', role: 'USER' },
-        admin: { id: 3, username: 'admin', full_name: 'Facility Administrator', phone: '9998887770', role: 'ADMINISTRATOR' }
+        user1: { id: 1, username: 'user1', full_name: 'John Doe', phone: '9876543210', email: 'john.doe@example.com', role: 'USER' },
+        user2: { id: 2, username: 'user2', full_name: 'Jane Smith', phone: '9123456780', email: 'jane.smith@example.com', role: 'USER' },
+        admin: { id: 3, username: 'admin', full_name: 'Facility Administrator', phone: '9998887770', email: 'admin@sportsfacility.com', role: 'ADMINISTRATOR' }
     },
     facilities: [],
     selectedFacility: null,
@@ -20,6 +20,14 @@ const state = {
     activeCategory: 'ALL',
     searchQuery: ''
 };
+
+// Helper: Extract Avatar Initials
+function getInitials(name) {
+    if (!name) return '??';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 // Sport Category Icons & Badges
 const sportIcons = {
@@ -47,6 +55,7 @@ const allBookingsBadge = document.getElementById('allBookingsBadge');
 const bookingModal = document.getElementById('bookingModal');
 const receiptModal = document.getElementById('receiptModal');
 const historyModal = document.getElementById('historyModal');
+const loginModal = document.getElementById('loginModal');
 const reservationForm = document.getElementById('reservationForm');
 const bookingQuantityInput = document.getElementById('bookingQuantityInput');
 
@@ -56,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initFilters();
     initQuantityStepper();
+    loginAs(state.currentUser, true);
     loadFacilities();
     loadMyBookings();
     if (state.currentRole === 'ADMINISTRATOR') {
@@ -76,33 +86,117 @@ function showNotification(message, type = 'success') {
     }, 6000);
 }
 
-// Actor & Role Switcher
-function initActor() {
-    userSelector.addEventListener('change', (e) => {
-        state.currentUser = e.target.value;
-        const user = state.users[state.currentUser];
-        state.currentRole = user.role;
+// Global Login / Role Switching Mechanism (FR9, BR10)
+window.loginAs = function(username, quiet = false) {
+    if (!state.users[username]) {
+        showNotification(`User '${username}' not recognized in system.`, 'error');
+        return;
+    }
 
-        // Update UI Badges & Navigation
+    state.currentUser = username;
+    const user = state.users[username];
+    state.currentRole = user.role;
+
+    // 1. Sync User Selector Dropdown
+    if (userSelector && userSelector.value !== username) {
+        userSelector.value = username;
+    }
+
+    // 2. Update Header Widget
+    const initials = getInitials(user.full_name);
+    const headerAvatar = document.getElementById('headerUserAvatar');
+    const headerName = document.getElementById('headerUserName');
+    const headerPhone = document.getElementById('headerUserPhone');
+
+    if (headerAvatar) headerAvatar.textContent = initials;
+    if (headerName) headerName.textContent = user.full_name;
+    if (headerPhone) headerPhone.textContent = user.phone;
+
+    if (activeRoleBadge) {
         activeRoleBadge.textContent = `${user.role} ROLE`;
         activeRoleBadge.className = `role-pill ${user.role.toLowerCase() === 'administrator' ? 'admin' : 'user'}`;
+    }
 
-        if (state.currentRole === 'ADMINISTRATOR') {
-            adminTabBtn.style.display = 'flex';
-        } else {
-            adminTabBtn.style.display = 'none';
-            // If admin tab was active, switch to facilities
-            const activeTab = document.querySelector('.tab-btn.active');
-            if (activeTab && activeTab.dataset.tab === 'tab-admin') {
-                switchTab('tab-facilities');
-            }
+    // 3. Update Active Session Highlight in Tab 4 (Logins Portal)
+    const activeCardAvatar = document.getElementById('activeCardAvatar');
+    const activeCardFullName = document.getElementById('activeCardFullName');
+    const activeCardRolePill = document.getElementById('activeCardRolePill');
+    const activeCardUsername = document.getElementById('activeCardUsername');
+    const activeCardPhone = document.getElementById('activeCardPhone');
+    const activeCardEmail = document.getElementById('activeCardEmail');
+
+    if (activeCardAvatar) activeCardAvatar.textContent = initials;
+    if (activeCardFullName) activeCardFullName.textContent = user.full_name;
+    if (activeCardRolePill) {
+        activeCardRolePill.textContent = `${user.role} ROLE`;
+        activeCardRolePill.className = `role-pill ${user.role.toLowerCase() === 'administrator' ? 'admin' : 'user'}`;
+    }
+    if (activeCardUsername) activeCardUsername.textContent = user.username;
+    if (activeCardPhone) activeCardPhone.textContent = user.phone;
+    if (activeCardEmail) activeCardEmail.textContent = user.email;
+
+    // 4. Highlight Selected Card in Quick Accounts Grid
+    ['user1', 'user2', 'admin'].forEach(u => {
+        const card = document.getElementById(`card-${u}`);
+        if (card) card.classList.toggle('active-card', u === username);
+    });
+
+    // 5. Update Administrator Console Tab Visibility
+    if (state.currentRole === 'ADMINISTRATOR') {
+        adminTabBtn.style.display = 'flex';
+    } else {
+        adminTabBtn.style.display = 'none';
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab && activeTab.dataset.tab === 'tab-admin') {
+            switchTab('tab-facilities');
         }
+    }
 
-        showNotification(`Switched active actor to: ${user.full_name} (${user.role})`, 'success');
+    if (!quiet) {
+        showNotification(`Logged in successfully as: ${user.full_name} (${user.role})`, 'success');
         loadMyBookings();
         if (state.currentRole === 'ADMINISTRATOR') {
             loadAdminBookings();
         }
+    }
+};
+
+// Actor & Role Switcher Initialization
+function initActor() {
+    userSelector.addEventListener('change', (e) => {
+        loginAs(e.target.value);
+    });
+
+    // Direct Login Form Listener
+    const directLoginForm = document.getElementById('directLoginForm');
+    directLoginForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const inputVal = document.getElementById('loginIdentifierInput').value.trim().toLowerCase();
+        let matched = null;
+        for (const [key, u] of Object.entries(state.users)) {
+            if (u.username.toLowerCase() === inputVal || u.phone === inputVal || u.full_name.toLowerCase().includes(inputVal)) {
+                matched = key;
+                break;
+            }
+        }
+        if (matched) {
+            loginAs(matched);
+            document.getElementById('loginIdentifierInput').value = '';
+        } else {
+            showNotification(`Account '${inputVal}' not found. Please use 'user1', 'user2', 'admin', or registered phone.`, 'error');
+        }
+    });
+
+    // Modal Triggers
+    document.getElementById('openLoginModalBtn')?.addEventListener('click', () => {
+        loginModal?.showModal();
+    });
+    document.getElementById('closeLoginModalBtn')?.addEventListener('click', () => {
+        loginModal?.close();
+    });
+    document.getElementById('goToLoginTabBtn')?.addEventListener('click', () => {
+        loginModal?.close();
+        switchTab('tab-login');
     });
 }
 

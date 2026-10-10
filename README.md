@@ -5,7 +5,7 @@
 [![Express](https://img.shields.io/badge/Express-5.x-000000?logo=express&logoColor=white)](https://expressjs.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-MariaDB%2012+-4479A1?logo=mysql&logoColor=white)](https://mariadb.org/)
 [![Tests](https://img.shields.io/badge/Tests-12%2F12%20Passing-brightgreen?logo=jest&logoColor=white)](file:///tests/testRunner.js)
-[![Aesthetics](https://img.shields.io/badge/UI-Modern%20Glassmorphism-00f2fe)](file:///public/css/style.css)
+[![Aesthetics](https://img.shields.io/badge/UI-Clean%20White%20Theme-0284c7)](file:///public/css/style.css)
 
 ---
 
@@ -24,7 +24,7 @@ The **Sports Facility Booking System** is a complete, runnable full-stack reserv
 
 - **Backend**: Node.js v26.8.2, Express v5.x, `mysql2/promise` connection pooling with transaction management.
 - **Database**: MariaDB / MySQL with normalized InnoDB schema, foreign key constraints, and check constraints (`available_quantity >= 0`).
-- **Frontend**: Semantic HTML5, Vanilla CSS3 (custom design system, glassmorphism, Google Fonts Outfit & Plus Jakarta Sans, vibrant athletic dark mode, micro-animations), Vanilla JavaScript.
+- **Frontend**: Semantic HTML5, Vanilla CSS3 (clean light design system, Google Fonts Outfit & Plus Jakarta Sans, vibrant athletic accents, crisp soft elevations, micro-animations), Vanilla JavaScript.
 - **Security & RBAC**: Strict role boundaries separating **User** and **Administrator**, ownership verification, and parameter-sanitized SQL queries.
 
 ```
@@ -56,7 +56,7 @@ Sports-Facility-Booking-System/
 ├── public/
 │   ├── index.html                 # Single Page Application HTML5 structure
 │   ├── css/
-│   │   └── style.css              # Modern CSS design system & dark glassmorphism
+│   │   └── style.css              # Modern CSS design system & white-themed UI
 │   └── js/
 │       └── app.js                 # Interactive client logic & live test harness
 ├── tests/
