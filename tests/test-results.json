@@ -1,0 +1,212 @@
+{
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "notRun": 0,
+    "executedAt": "2026-10-10T07:16:35.801Z"
+  },
+  "tests": [
+    {
+      "testId": "T1",
+      "name": "Duplicate Resource Selection Without Duplicate Records",
+      "linkedRule": "FR5, BR7",
+      "preconditions": "Clean seed state. Facility R101 has availability 10.",
+      "inputs": {
+        "resource_code": "R101",
+        "quantity": 1,
+        "customer_name": "T1 User",
+        "customer_phone": "9876543210",
+        "booking_date": "2026-10-11",
+        "identity_proof": "T1-MEM-101"
+      },
+      "expectedResult": "HTTP 201 Created with exactly one confirmed booking reference in database.",
+      "actualResult": "HTTP 201, reference: BK-20261010-EC24B6, DB count: 1",
+      "status": "PASS",
+      "evidence": "Created reference BK-20261010-EC24B6, R101 remaining availability: 9",
+      "timestamp": "2026-10-10T07:16:35.042Z"
+    },
+    {
+      "testId": "T2",
+      "name": "Quantity Boundaries (0, 1, 5, 6, and 1.5)",
+      "linkedRule": "BR1, FR2",
+      "preconditions": "Facility R103 has availability 20.",
+      "inputs": {
+        "quantities": [
+          0,
+          1,
+          5,
+          6,
+          1.5
+        ]
+      },
+      "expectedResult": "Quantities 1 and 5 accepted (HTTP 201); 0, 6, and 1.5 rejected with HTTP 400 (BR1).",
+      "actualResult": "qty=0 -> HTTP 400 (success=false, expected=false); qty=1 -> HTTP 201 (success=true, expected=true); qty=5 -> HTTP 201 (success=true, expected=true); qty=6 -> HTTP 400 (success=false, expected=false); qty=1.5 -> HTTP 400 (success=false, expected=false)",
+      "status": "PASS",
+      "evidence": "Sub-tests verified: qty=0 -> HTTP 400 (success=false, expected=false) | qty=1 -> HTTP 201 (success=true, expected=true) | qty=5 -> HTTP 201 (success=true, expected=true) | qty=6 -> HTTP 400 (success=false, expected=false) | qty=1.5 -> HTTP 400 (success=false, expected=false)",
+      "timestamp": "2026-10-10T07:16:35.072Z"
+    },
+    {
+      "testId": "T3",
+      "name": "Unavailable Resource Rejection Without State Changes",
+      "linkedRule": "BR2, BR6",
+      "preconditions": "Facility R104 has available_quantity = 0 (Sold out).",
+      "inputs": {
+        "resource_code": "R104",
+        "quantity": 1,
+        "customer_name": "T3 Zero Stock Tester",
+        "customer_phone": "9876543210",
+        "booking_date": "2026-10-11",
+        "identity_proof": "T3-ZERO-01"
+      },
+      "expectedResult": "HTTP 400 rejection; availability unchanged (0); no reservation record created (BR6).",
+      "actualResult": "HTTP 400, error: \"Insufficient availability for R104 (Sports Facility D). Requested: 1, Available: 0. Booking rejected.\", stock before=0, stock after=0, records created=0",
+      "status": "PASS",
+      "evidence": "BR6 verified: Transaction aborted cleanly without state side-effects.",
+      "timestamp": "2026-10-10T07:16:35.080Z"
+    },
+    {
+      "testId": "T4",
+      "name": "Base-Amount Booking Charge Boundaries (Rs.999, Rs.1,000, Rs.1,001)",
+      "linkedRule": "BR4, FR3",
+      "preconditions": "Rule BR4: booking charge = Rs.50 if base < 1000; Rs.0 if base >= 1000.",
+      "inputs": {
+        "boundary_999": 999,
+        "boundary_1000": 1000,
+        "boundary_1001": 1001
+      },
+      "expectedResult": "Rs.999 => charge Rs.50 (total Rs.1049); Rs.1000 => charge Rs.0 (total Rs.1000); Rs.1001 => charge Rs.0 (total Rs.1001)",
+      "actualResult": "Rs.999 charge=50, total=1049 | Rs.1000 quote charge=0, total=1000 | Rs.1001 charge=0, total=1001",
+      "status": "PASS",
+      "evidence": "BR4 threshold logic strictly verified across mathematical and live API quotation boundaries.",
+      "timestamp": "2026-10-10T07:16:35.086Z"
+    },
+    {
+      "testId": "T5",
+      "name": "Successful Atomic Reservation",
+      "linkedRule": "FR5, BR7",
+      "preconditions": "Facility R102 has rate Rs.799, availability 5.",
+      "inputs": {
+        "resource_code": "R102",
+        "quantity": 2,
+        "customer_name": "T5 Atomic User",
+        "customer_phone": "9876543210",
+        "booking_date": "2026-10-11",
+        "identity_proof": "T5-ATOMIC-01"
+      },
+      "expectedResult": "HTTP 201; CONFIRMED status; availability decremented by 2; items and initial history logged atomically (BR7).",
+      "actualResult": "HTTP 201, ref: BK-20261010-B46E3A, base: 1598, total: 1598, stock: 5 -> 3, history records: 1",
+      "status": "PASS",
+      "evidence": "Reservation, items, availability decrement, and status history committed in single ACID MySQL transaction.",
+      "timestamp": "2026-10-10T07:16:35.099Z"
+    },
+    {
+      "testId": "T6",
+      "name": "Invalid and Missing Details Rejection",
+      "linkedRule": "BR5, FR4",
+      "preconditions": "Validation rules require non-blank name, 10-digit phone, future date, and non-blank ID.",
+      "inputs": {
+        "testCasesCount": 5
+      },
+      "expectedResult": "All invalid cases rejected with HTTP 400 and clear descriptive error messages (BR5).",
+      "actualResult": "blank customer_name: HTTP 400 (Customer name is required and cannot be blank.) | 9-digit phone: HTTP 400 (Invalid phone number: '987654321'. Must contain exactly 10 numeric digits.) | alpha phone: HTTP 400 (Invalid phone number: '987654321a'. Must contain exactly 10 numeric digits.) | past booking_date: HTTP 400 (Booking date cannot be in the past: '2023-01-01'. Must be today or a future date.) | blank identity_proof: HTTP 400 (Identity / reference field is required and cannot be blank.)",
+      "status": "PASS",
+      "evidence": "BR5 constraints strictly guarded: blank customer_name: HTTP 400 (Customer name is required and cannot be blank.)\n9-digit phone: HTTP 400 (Invalid phone number: '987654321'. Must contain exactly 10 numeric digits.)\nalpha phone: HTTP 400 (Invalid phone number: '987654321a'. Must contain exactly 10 numeric digits.)\npast booking_date: HTTP 400 (Booking date cannot be in the past: '2023-01-01'. Must be today or a future date.)\nblank identity_proof: HTTP 400 (Identity / reference field is required and cannot be blank.)",
+      "timestamp": "2026-10-10T07:16:35.113Z"
+    },
+    {
+      "testId": "T7",
+      "name": "Availability Changing Before Confirmation / Concurrency Depletion",
+      "linkedRule": "BR2, BR6",
+      "preconditions": "Facility R105 has current availability 3.",
+      "inputs": {
+        "booking1_qty": 2,
+        "booking2_qty": 2,
+        "initial_stock": 3
+      },
+      "expectedResult": "First booking succeeds (HTTP 201); Second booking fails with HTTP 400 Insufficient availability; stock remains 1.",
+      "actualResult": "Booking 1: HTTP 201; Booking 2: HTTP 400 (\"Insufficient availability for R105 (Sports Facility E). Requested: 2, Available: 1. Booking rejected.\"); Final stock: 1",
+      "status": "PASS",
+      "evidence": "Row locking FOR UPDATE ensures serialized revalidation and prevents negative inventory.",
+      "timestamp": "2026-10-10T07:16:35.126Z"
+    },
+    {
+      "testId": "T8",
+      "name": "Unauthorized Access to Other User Booking & Unauthorized Status Update",
+      "linkedRule": "BR10, FR6, FR9",
+      "preconditions": "Booking T5 belongs to user1 (John Doe). user2 attempts access.",
+      "inputs": {
+        "target_booking": "BK-20261010-B46E3A",
+        "requesting_user": "user2"
+      },
+      "expectedResult": "HTTP 403 Forbidden on all unauthorized access and unauthorized status progression attempts (BR10).",
+      "actualResult": "View: HTTP 403 (\"Unauthorized: You are not permitted to view booking 'BK-20261010-B46E3A' belonging to another user.\"); Cancel: HTTP 403 (\"Unauthorized: You cannot cancel booking 'BK-20261010-B46E3A' belonging to another user.\"); Status update: HTTP 403 (\"Unauthorized access: Action requires 'ADMINISTRATOR' privileges. Current simulated user 'user1' has role 'USER'.\")",
+      "status": "PASS",
+      "evidence": "Role and ownership checks strictly enforced by middleware and service layers.",
+      "timestamp": "2026-10-10T07:16:35.140Z"
+    },
+    {
+      "testId": "T9",
+      "name": "Administrator Status Progression and Stage-Skipping Prevention",
+      "linkedRule": "BR8, FR7",
+      "preconditions": "T5 Booking currently in CONFIRMED status.",
+      "inputs": {
+        "stage_skip_attempt": "COMPLETED",
+        "valid_progression": [
+          "CHECKED_IN",
+          "COMPLETED"
+        ]
+      },
+      "expectedResult": "Stage-skipping rejected with HTTP 400 (BR8); Sequential progression CONFIRMED -> CHECKED_IN -> COMPLETED succeeds.",
+      "actualResult": "Skip: HTTP 400 (\"Invalid stage transition: Cannot advance booking 'BK-20261010-B46E3A' directly from 'CONFIRMED' to 'COMPLETED'. Administrators cannot skip stages; booking must first transition to 'CHECKED_IN' (or 'BOARDED').\"); Step 1: CHECKED_IN; Step 2: COMPLETED; History count: 3",
+      "status": "PASS",
+      "evidence": "BR8 operational rule verified. Audit history logged each stage transition.",
+      "timestamp": "2026-10-10T07:16:35.158Z"
+    },
+    {
+      "testId": "T10",
+      "name": "Cancellation and Repeated Cancellation (One-Time Stock Restoration)",
+      "linkedRule": "BR8, BR9, FR8",
+      "preconditions": "New CONFIRMED booking for R103 with quantity 3.",
+      "inputs": {
+        "booking": "BK-20261010-C3B348",
+        "quantity": 3
+      },
+      "expectedResult": "First cancellation: status CANCELLED, stock restored. Repeated cancellation: HTTP 400 rejection, stock untouched (BR9).",
+      "actualResult": "Initial stock: 14 -> After booking: 11 -> After cancel 1: 14 -> Repeat cancel: HTTP 400 (\"Booking 'BK-20261010-C3B348' is already CANCELLED. Repeated cancellation is rejected; availability cannot be restored multiple times.\"), stock: 14",
+      "status": "PASS",
+      "evidence": "BR9 stock restoration idempotency strictly verified. Stock restored exactly once.",
+      "timestamp": "2026-10-10T07:16:35.178Z"
+    },
+    {
+      "testId": "T11",
+      "name": "Application Restart with Booking and Availability Persistence",
+      "linkedRule": "FR10",
+      "preconditions": "Active bookings and altered availability exist in database.",
+      "inputs": {
+        "restart_signal": "SIGRESTART"
+      },
+      "expectedResult": "Server restarts cleanly; all historical reservations, items, and resource availability persist in MySQL (FR10).",
+      "actualResult": "HTTP 200, bookings pre-restart: 6, bookings post-restart: 6, queryable via API: 6",
+      "status": "PASS",
+      "evidence": "Relational persistence verified across independent server process lifecycle.",
+      "timestamp": "2026-10-10T07:16:35.788Z"
+    },
+    {
+      "testId": "T12",
+      "name": "Facility Rate Changes Without Altering Historical Booking Snapshots",
+      "linkedRule": "BR3, FR5",
+      "preconditions": "Booking T1 for R101 was created at unit rate Rs.499, total Rs.549.",
+      "inputs": {
+        "resource": "R101",
+        "old_rate": 499,
+        "updated_facility_rate": 850
+      },
+      "expectedResult": "Historical booking fare snapshot remains immutably Rs.499.00 / Rs.549.00 despite facility price changes (BR3).",
+      "actualResult": "API returned snapshot unit_rate: Rs.499, total: Rs.549 (Original preserved: true)",
+      "status": "PASS",
+      "evidence": "BR3 immutable fare snapshot verified. Dynamic resource rate shifts do not compromise historical financial records.",
+      "timestamp": "2026-10-10T07:16:35.800Z"
+    }
+  ]
+}
